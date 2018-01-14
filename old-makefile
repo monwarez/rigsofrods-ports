@@ -1,0 +1,120 @@
+# Reborn :	rigsofrods
+# Created by: Thibault Payet <monwarez@mailoo.org>
+# $FreeBSD$
+#
+
+PORTNAME=	rigsofrods
+DISTVERSION=	0.4.7.0
+CATEGORIES=	games
+
+MAINTAINER=	monwarez@mailoo.org
+COMMENT=	Truck, car, airplane, and boat simulator with advanced physics
+
+LICENSE=	GPLv3+
+LICENSE_FILE=	${WRKSRC}/COPYING
+
+LIB_DEPENDS=	libcurl.so:ftp/curl \
+		libboost_system.so:devel/boost-libs \
+		libgtk-x11-2.0.so:x11-toolkits/gtk20 \
+		libOIS.so:devel/ois \
+		libCaelum.so:graphics/rigsofrods-caelum
+
+
+BUILD_DEPENDS=	${LOCALBASE}/lib/libPagedGeometry.a:graphics/rigsofrods-pagedgeometry \
+		${LOCALBASE}/lib/libMyGUI.OgrePlatform.a:x11-toolkits/mygui-ogre \
+		${LOCALBASE}/lib/libSocketW.a:net/socketw \
+		${LOCALBASE}/include/rapidjson/document.h:devel/rapidjson
+
+#BUILD_DEPENDS=	libOIS.so:devel/ois \
+		unzip:archivers/unzip
+#RUN_DEPENDS=	libOIS.so:devel/ois \
+		xset:x11/xset
+
+USE_GITHUB=	yes
+GH_ACCOUNT=	RigsOfRods
+GH_PROJECT=	rigs-of-rods
+GH_TAGNAME=	c3089b3
+#GH_TAGNAME=	80e9bfe
+
+USES=	cmake openal:soft gettext-runtime:lib python:3.0+
+USE_WX=	3.0
+USE_CXXSTD=	c++11
+USE_XORG=	x11
+LDFLAGS+=	-lthr
+
+# CG unavailable for FreeBSD
+CMAKE_ARGS=	-DROR_USE_PAGED=TRUE \
+		-DROR_USE_CAELUM=TRUE \
+		-DROR_USE_SOCKETW=TRUE \
+		-DROR_USE_ANGELSCRIPT=FALSE \
+		-DCMAKE_CONFIGURATION_TYPES="Release"
+#		-DLOCALBASE="${LOCALBASE}" \
+#		-DwxWidgets_CONFIG_EXECUTABLE="${WX_CONFIG}"
+
+#PORTDOCS=	*
+
+#SUB_FILES=	RoR.sh rorconfig.sh
+
+#LIB_FILES=	dependencies/ogrenew/OgreMain/libOgreMain.so.1 \
+		dependencies/ogrenew/PlugIns/OctreeSceneManager/Plugin_OctreeSceneManager.so \
+		dependencies/ogrenew/PlugIns/ParticleFX/Plugin_ParticleFX.so \
+		dependencies/ogrenew/RenderSystems/GL/RenderSystem_GL.so \
+		dependencies/Caelum-2006-11-09/libcaelum.so \
+		dependencies/mygui/libmygui.so \
+		dependencies/hydrax/libhydrax.so \
+		dependencies/mysocketw/libmysocketw.so
+
+
+#.if ${ARCH} == "sparc64"
+#BROKEN=		Does not compile on sparc64
+#.endif
+
+#post-extract:
+#	@${RM} -rf ${WRKSRC}/dependencies/ogrenew/Dependencies
+
+#post-patch:
+#	@${REINPLACE_CMD} -e 's|%%DATADIR%%|${DATADIR}|; \
+#		s|%%PREFIX%%|${PREFIX}|' \
+#		${WRKSRC}/main/source/Settings.cpp \
+#		${WRKSRC}/configurator/source/configurator.cpp
+#.if ${OSVERSION} >= 800067
+# after strnlen was introduced, use it
+#	@${REINPLACE_CMD} -e '/strnlen/ d' ${WRKSRC}/main/CMakeLists.txt \
+#		${WRKSRC}/configurator/CMakeLists.txt
+#.endif
+
+#do-install:
+# libs
+#	${MKDIR} ${PREFIX}/lib/${PORTNAME}
+#.for f in ${LIB_FILES}
+#	${INSTALL_PROGRAM} ${WRKSRC}/${f} ${PREFIX}/lib/${PORTNAME}
+#.endfor
+
+# binaries
+#	${MKDIR} ${PREFIX}/libexec/${PORTNAME}
+#	${INSTALL_PROGRAM} ${WRKSRC}/main/RoR ${PREFIX}/libexec/${PORTNAME}
+#	${INSTALL_PROGRAM} ${WRKSRC}/configurator/rorconfig ${PREFIX}/libexec/${PORTNAME}
+
+# data
+#	${MKDIR} ${DATADIR}
+#	${SED} -e '/Plugin_CgProgramManager/ s|^|#|' \
+#		< ${WRKSRC}/bin/release/linux/plugins.cfg \
+#		> ${DATADIR}/plugins.cfg
+#	${UNZIP_CMD} -qq -o -d ${DATADIR} ${DISTDIR}/${PORTNAME}-contents-${PORTVERSION}.zip \
+		languages/\* resources/\* skeleton/\* streams/\*
+
+# wrappers
+#	${INSTALL_SCRIPT} ${WRKDIR}/RoR.sh ${PREFIX}/bin/RoR
+#	${INSTALL_SCRIPT} ${WRKDIR}/rorconfig.sh ${PREFIX}/bin/rorconfig
+
+#docs
+#.if !defined(NOPORTDOCS)
+#	${MKDIR} ${DOCSDIR}
+#	${UNZIP_CMD} -qq -o -d ${DOCSDIR} ${DISTDIR}/${PORTNAME}-contents-${PORTVERSION}.zip \
+#		\*.pdf
+#.endif
+
+#post-install:
+#	@${CAT} ${PKGMESSAGE}
+
+.include <bsd.port.mk>

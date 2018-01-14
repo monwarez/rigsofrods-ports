@@ -1,0 +1,34 @@
+--- source/main/CMakeLists.txt.orig	2018-01-02 07:27:59 UTC
++++ source/main/CMakeLists.txt
+@@ -375,7 +375,21 @@ IF (WIN32)
+     add_definitions("/wd4305 /wd4244 /wd4193 -DNOMINMAX")
+ ELSEIF (UNIX)
+     #  include_directories(${GTK_INCLUDE_DIRS})
+-    set(OS_LIBS "X11 -l${CMAKE_DL_LIBS} -lrt")
++    find_package(X11 REQUIRED)
++    target_link_libraries(${BINNAME} PRIVATE
++    ${X11_LIBRARIES}
++    )
++    target_include_directories(${BINNAME} PRIVATE
++    ${X11_INCLUDE_DIRS}
++    )
++    find_package(Intl REQUIRED)
++    target_link_libraries(${BINNAME} PRIVATE
++    ${Intl_LIBRARIES}
++    )
++    target_include_directories(${BINNAME} PRIVATE
++    ${Intl_INCLUDE_DIRS}
++    )
++    set(OS_LIBS "rt")
+ ENDIF (WIN32)
+ target_link_libraries(${BINNAME} PRIVATE
+         ${OS_LIBS}
+@@ -487,6 +501,8 @@ if (CURL_FOUND)
+     target_link_libraries(${BINNAME} PRIVATE ${CURL_LIBRARY})
+     target_include_directories(${BINNAME} PRIVATE ${CURL_INCLUDE_DIR})
+     target_compile_definitions(${BINNAME} PRIVATE USE_CURL)
++    find_package(OpenSSL REQUIRED)
++    target_link_libraries(${BINNAME} PRIVATE ${OPENSSL_LIBRARIES})
+ else ()
+     message(WARNING "Building ${BINNAME} without cURL. Some functionality may be missing.")
+ endif ()
