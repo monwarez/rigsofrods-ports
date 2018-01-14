@@ -38,7 +38,6 @@ DOS2UNIX_GLOB=	*.cpp *.h *.txt
 USE_WX=	3.0
 USE_CXXSTD=	c++14
 USE_XORG=	x11
-USE_GCC=	yes
 LDFLAGS+=	-lthr
 
 # CG unavailable for FreeBSD
